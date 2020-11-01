@@ -1,0 +1,29 @@
+//
+// Created by Patryk on 2020-11-01.
+//
+
+#ifndef BLOCKCHAIN_HEADER_H
+#define BLOCKCHAIN_HEADER_H
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <random>
+#include <algorithm>
+#include <cstring>
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#include "hFiles/Hash.h"
+
+struct User {
+    string name;
+    string public_key;
+    double balance;
+};
+
+
+#endif //BLOCKCHAIN_HEADER_H
