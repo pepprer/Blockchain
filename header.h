@@ -25,5 +25,11 @@ struct User {
     double balance;
 };
 
+struct Transaction {
+    string id;
+    string sender;
+    string recipient;
+    double sum;
+};
 
 #endif //BLOCKCHAIN_HEADER_H
