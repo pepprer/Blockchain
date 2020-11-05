@@ -30,6 +30,12 @@ struct Transaction {
     string sender;
     string recipient;
     double sum;
+    bool bad = false;
+};
+
+struct Block {
+    string hash;
+    vector<Transaction> transactions;
 };
 
 #endif //BLOCKCHAIN_HEADER_H

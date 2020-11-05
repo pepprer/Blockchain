@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "header.h"
 
 vector<User> generateUsers(int n)
@@ -18,9 +20,9 @@ vector<Transaction> generateTransactions(vector<User> users, int n)
     vector<Transaction> transactions;
     Transaction transaction;
     for(int i = 0; i < n; i++) {
-        transaction.sender = users.at(rand()%(100 + 1)).public_key;
+        transaction.sender = users.at(rand()%(1000)).public_key;
         do {
-            transaction.recipient = users.at(rand()%(100 + 1)).public_key;
+            transaction.recipient = users.at(rand()%(1000)).public_key;
         } while (transaction.sender == transaction.recipient);
         transaction.sum = rand()%(1000-1 + 1) + 1;
         transaction.id = myHash(transaction.sender + transaction.recipient + to_string(transaction.sum));
@@ -69,10 +71,50 @@ string merkleTreeHash(vector<Transaction> transactions) {
     return hashes.at(0);
 }
 
+string findHash(const string& prevBlockHash, vector<Transaction> transactions) {
+    string newBlockHash;
+    time_t timestamp = std::time(nullptr);
+    string version = "version1";
+    string merkleHash = merkleTreeHash(move(transactions));
+    string difficultyTarget = "0";
+    long long int nonce = 0;
+    do {
+        newBlockHash = myHash(prevBlockHash + to_string(timestamp) + version + merkleHash + to_string(nonce) + difficultyTarget);
+        nonce++;
+    } while (newBlockHash.substr(0, difficultyTarget.size()) != difficultyTarget);
+    return newBlockHash;
+}
+
 int main() {
     vector<User> users = generateUsers(1000);
     vector<Transaction> transactions = generateTransactions(users, 10000);
-    vector<Transaction> transactions100 = get100Transactions(transactions);
-    cout << merkleTreeHash(transactions100) << endl;
+    vector<Block> blocks;
+
+    while(!transactions.empty()) {
+        vector<Transaction> transactions100 = get100Transactions(transactions);
+        Block block;
+        string hash;
+        if(blocks.empty()) {
+            hash = findHash("0", transactions100);
+        } else {
+            hash = findHash(blocks.back().hash, transactions100);
+        }
+
+        for(int i = 0; i < transactions100.size(); i++) {
+            Transaction transaction = transactions100.at(i);
+            int sender = find_if(users.begin(), users.end(), [transaction, i](const User& user){return user.public_key == transaction.sender; }) - users.begin();
+            int recipient = find_if(users.begin(), users.end(), [transaction, i](const User& user){return user.public_key == transaction.recipient; }) - users.begin();
+            if(users.at(sender).balance >= transaction.sum) {
+                users.at(sender).balance -= transaction.sum;
+                users.at(recipient).balance += transaction.sum;
+            } else {
+                transactions100.at(i).bad = true;
+            }
+        }
+        block.hash = hash;
+        block.transactions = transactions100;
+        blocks.push_back(block);
+    }
+
     return 0;
 }
