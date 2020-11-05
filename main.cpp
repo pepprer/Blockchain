@@ -111,6 +111,7 @@ int main() {
                 transactions100.at(i).bad = true;
             }
         }
+        cout << "Iskastas blokas: " << hash << endl;
         block.hash = hash;
         block.transactions = transactions100;
         blocks.push_back(block);
