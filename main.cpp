@@ -38,10 +38,41 @@ vector<Transaction> get100Transactions(vector<Transaction>& transactions) {
     return returnTransactions;
 }
 
+string merkleTreeHash(vector<Transaction> transactions) {
+    int size = transactions.size();
+    vector<string> hashes;
+    for(int i = 0; i < size; i++) {
+        if(i + 1 < size) {
+            hashes.push_back(myHash(transactions.at(i).id + transactions.at(i+1).id));
+            i++;
+        } else {
+            hashes.push_back(myHash(transactions.at(i).id));
+        }
+    }
+
+    while(hashes.size() != 1) {
+        vector<string> newHashes;
+        size = hashes.size();
+
+        for(int i = 0; i < size; i++) {
+            if(i + 1 < size) {
+                newHashes.push_back(myHash(hashes.at(i) + hashes.at(i+1)));
+                i++;
+            } else {
+                newHashes.push_back(myHash(hashes.at(i)));
+            }
+
+        }
+        hashes = newHashes;
+    }
+
+    return hashes.at(0);
+}
+
 int main() {
     vector<User> users = generateUsers(1000);
     vector<Transaction> transactions = generateTransactions(users, 10000);
     vector<Transaction> transactions100 = get100Transactions(transactions);
-
+    cout << merkleTreeHash(transactions100) << endl;
     return 0;
 }
