@@ -13,5 +13,8 @@
 2. Sugeneruoja 10000 transakcijų
 3. Iškasa bloką kiekvienam transakcijų rinkiniui
 
+[v0.2](https://github.com/pepprer/Blockchain/releases/tag/v0.2) versija:
+1. Sumodeliuotas "decentralizuotą" naujų blokų kasimas
+
 Iškasus bloką ekrane pamatysite jo hash'a. </br>
 Pvz.: **Iskastas blokas: 07448cc8226e249ae47a1671493a8c44684562c12215446a548a2410ca744457**
