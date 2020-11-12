@@ -1,6 +1,3 @@
-#include <random>
-#include <utility>
-
 #include "header.h"
 
 vector<User> generateUsers(int n) {
