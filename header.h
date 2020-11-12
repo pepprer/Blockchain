@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cstring>
 #include <bits/stdc++.h>
+#include <iterator>
 
 using namespace std;
 
@@ -31,6 +32,10 @@ struct Transaction {
     string recipient;
     double sum;
     bool bad = false;
+};
+
+struct TransactionBox {
+    vector<Transaction> transactions;
 };
 
 struct Block {
