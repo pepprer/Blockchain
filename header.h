@@ -5,6 +5,7 @@
 #ifndef BLOCKCHAIN_HEADER_H
 #define BLOCKCHAIN_HEADER_H
 
+#include <bitcoin/bitcoin.hpp>
 #include <iostream>
 #include <fstream>
 #include <string>

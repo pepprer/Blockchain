@@ -43,42 +43,51 @@ vector<Transaction> get100Transactions(vector<Transaction> transactions) {
     return returnTransactions;
 }
 
-string merkleTreeHash(vector<Transaction> transactions) {
-    int size = transactions.size();
-    vector<string> hashes;
-    for (int i = 0; i < size; i++) {
-        if (i + 1 < size) {
-            hashes.push_back(myHash(transactions.at(i).id + transactions.at(i + 1).id));
-            i++;
-        } else {
-            hashes.push_back(myHash(transactions.at(i).id));
+bc::hash_digest create_merkle(bc::hash_list& merkle)
+{
+    if (merkle.empty())
+        return bc::null_hash;
+    else if (merkle.size() == 1)
+        return merkle[0];
+    while (merkle.size() > 1)
+    {
+        if (merkle.size() % 2 != 0)
+            merkle.push_back(merkle.back());
+        assert(merkle.size() % 2 == 0);
+        bc::hash_list new_merkle;
+        for (auto it = merkle.begin(); it != merkle.end(); it += 2)
+        {
+            bc::data_chunk concat_data(bc::hash_size * 2);
+            auto concat = bc::serializer<
+                    decltype(concat_data.begin())>(concat_data.begin());
+            concat.write_hash(*it);
+            concat.write_hash(*(it + 1));
+            bc::hash_digest new_root = bc::bitcoin_hash(concat_data);
+            new_merkle.push_back(new_root);
         }
+        merkle = new_merkle;
+        std::cout << "Current merkle hash list:" << std::endl;
+        for (const auto& hash: merkle)
+            std::cout << " " << bc::encode_base16(hash) << std::endl;
+        std::cout << std::endl;
     }
-
-    while (hashes.size() != 1) {
-        vector<string> newHashes;
-        size = hashes.size();
-
-        for (int i = 0; i < size; i++) {
-            if (i + 1 < size) {
-                newHashes.push_back(myHash(hashes.at(i) + hashes.at(i + 1)));
-                i++;
-            } else {
-                newHashes.push_back(myHash(hashes.at(i)));
-            }
-
-        }
-        hashes = newHashes;
-    }
-
-    return hashes.at(0);
+    return merkle[0];
 }
 
-string findHash(const string &prevBlockHash, vector<Transaction> transactions, long long int nonceTo) {
+string findHash(const string &prevBlockHash, const vector<Transaction>& transactions, long long int nonceTo) {
+
+    bc::hash_list tx_hashes;
+    for (const auto& transaction : transactions) {
+        char chars[65];
+        strcpy(chars, transaction.id.c_str());
+        tx_hashes.push_back(bc::hash_literal(chars));
+    }
+    const bc::hash_digest merkle_root = create_merkle(tx_hashes);
+    auto merkleHash = bc::encode_base16(merkle_root);
+
     string newBlockHash;
     time_t timestamp = std::time(nullptr);
     string version = "version1";
-    string merkleHash = merkleTreeHash(move(transactions));
     string difficultyTarget = "0";
     long long int nonce = 0;
     for (long long int i = nonce; i <= nonceTo; i++) {
