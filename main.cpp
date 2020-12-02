@@ -66,11 +66,12 @@ bc::hash_digest create_merkle(bc::hash_list& merkle)
             new_merkle.push_back(new_root);
         }
         merkle = new_merkle;
-        std::cout << "Current merkle hash list:" << std::endl;
+        cout << "Current merkle hash list:" << endl;
         for (const auto& hash: merkle)
-            std::cout << " " << bc::encode_base16(hash) << std::endl;
-        std::cout << std::endl;
+        cout << " " << bc::encode_base16(hash) << endl;
+        cout << endl;
     }
+
     return merkle[0];
 }
 
@@ -130,6 +131,7 @@ int main() {
                 } else {
                     hash = findHash(blocks.back().hash, transactionBoxes.at(i).transactions, nonceTo);
                 }
+
                 i++;
             }
 
@@ -166,7 +168,7 @@ int main() {
 
             transactions.erase(transactions.begin() + transactionNumber);
         }
-        cout << "Iskastas blokas: " << hash << endl;
+        cout << blocks.size()+1 << " Iskastas blokas: " << hash << endl;
         block.hash = hash;
         block.transactions = transactionBoxes.at(index).transactions;
         blocks.push_back(block);
